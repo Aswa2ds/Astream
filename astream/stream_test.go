@@ -12,15 +12,8 @@ func BenchmarkStream(b *testing.B) {
 			list = append(list, 10000-i)
 		}
 		Stream(list).Sort(func(a, b interface{}) bool {
-			return a.(int) > b.(int)
-		}).Run()
-		//.Filter(func(a interface{}) bool {
-		//	return a.(int) > 10
-		//}).Sort(func(a, b interface{}) bool {
-		//	return a.(int) > b.(int)
-		//}).ForEach(func(a interface{}) {
-		//	a = a.(int) + 10
-		//})
+			return a.(int) < b.(int)
+		}).Collect()
 	}
 }
 
@@ -47,15 +40,44 @@ func BenchmarkNormal(b *testing.B) {
 		//for j := range list {
 		//	list[j] = list[j].(int) + 10
 		//}
+		sort.Sort(&list)
 		//for j := 0; j < len(list); j++ {
 		//	if list[j].(int) <= 1000 || list[j].(int) >= 5000 {
 		//		list = append(list[:j], list[j+1:]...)
 		//	}
 		//}
-		sort.Sort(&list)
+		//sort.Sort(&list)
 		//for j := range list {
 		//	_ = list[j] + 10
 		//}
 
 	}
 }
+
+//func BenchmarkInterfaceCast(b *testing.B) {
+//	for i := 0; i < b.N; i++ {
+//		var list []int
+//		for j := 0; j < 100000; j++ {
+//			list = append(list, i)
+//		}
+//		var a interface{}
+//		for _, j := range list {
+//			a = j
+//		}
+//		_ = a
+//	}
+//}
+//
+//func BenchmarkDoNotCast(b *testing.B) {
+//	for i := 0; i < b.N; i++ {
+//		var list []int
+//		for j := 0; j < 100000; j++ {
+//			list = append(list, i)
+//		}
+//		var a int
+//		for _, j := range list {
+//			a = j
+//		}
+//		_ = a
+//	}
+//}

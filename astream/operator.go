@@ -23,7 +23,7 @@ const (
 	opMin       NodeType = "Min"
 )
 
-var handleFuncMap = map[NodeType]func(node *flowNode, resultChan FlowResultChan){
+var handleFuncMap = map[NodeType]func(node *flowNode, resultChan flowResultChan){
 	opStream:    handleStream,
 	opForeach:   handleForEach,
 	opMap:       handleMap,

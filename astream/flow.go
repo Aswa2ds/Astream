@@ -78,7 +78,7 @@ func (flow *Flow) Sort(sortFunc SortFunc) *Flow {
 			SortFunc: sortFunc,
 		},
 		operator: sortFunc,
-		nodeType: "opSort",
+		nodeType: opSort,
 	}
 	flow.append(node)
 	return flow
@@ -197,7 +197,7 @@ func (flow *Flow) append(node *flowNode) {
 }
 
 func (flow *Flow) run() FlowResult {
-	resultChan := make(FlowResultChan)
+	resultChan := make(flowResultChan)
 
 	for _, flowNode := range *flow {
 		handler := handleFuncMap[flowNode.nodeType]

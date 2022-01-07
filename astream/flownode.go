@@ -13,9 +13,9 @@ type flowNode struct {
 	next        *flowNode
 }
 
-type handleFunc func(node *flowNode, resultChan FlowResultChan)
+type handleFunc func(node *flowNode, resultChan flowResultChan)
 
-var handleStream handleFunc = func(node *flowNode, resultChan FlowResultChan) {
+var handleStream handleFunc = func(node *flowNode, resultChan flowResultChan) {
 	output := node.next.channel
 	defer close(output)
 	for _, num := range node.heap.data {
@@ -23,7 +23,7 @@ var handleStream handleFunc = func(node *flowNode, resultChan FlowResultChan) {
 	}
 }
 
-var handleForEach handleFunc = func(node *flowNode, resultChan FlowResultChan) {
+var handleForEach handleFunc = func(node *flowNode, resultChan flowResultChan) {
 	defer close(resultChan)
 	forEachFunc := node.operator.(ForEachFunc)
 	for value, ok := <-node.channel; ok; value, ok = <-node.channel {
@@ -31,7 +31,7 @@ var handleForEach handleFunc = func(node *flowNode, resultChan FlowResultChan) {
 	}
 }
 
-var handleMap handleFunc = func(node *flowNode, resultChan FlowResultChan) {
+var handleMap handleFunc = func(node *flowNode, resultChan flowResultChan) {
 	output := node.next.channel
 	defer close(output)
 	mapFunc := node.operator.(MapFunc)
@@ -40,7 +40,7 @@ var handleMap handleFunc = func(node *flowNode, resultChan FlowResultChan) {
 	}
 }
 
-var handleFlatMap handleFunc = func(node *flowNode, resultChan FlowResultChan) {
+var handleFlatMap handleFunc = func(node *flowNode, resultChan flowResultChan) {
 	output := node.next.channel
 	defer close(output)
 	flatMapFunc := node.operator.(FlatMapFunc)
@@ -58,7 +58,7 @@ var handleFlatMap handleFunc = func(node *flowNode, resultChan FlowResultChan) {
 	waitGroup.Wait()
 }
 
-var handleReduce handleFunc = func(node *flowNode, resultChan FlowResultChan) {
+var handleReduce handleFunc = func(node *flowNode, resultChan flowResultChan) {
 	defer close(resultChan)
 	result := node.reduceBase
 	reduceFunc := node.operator.(ReduceFunc)
@@ -68,7 +68,7 @@ var handleReduce handleFunc = func(node *flowNode, resultChan FlowResultChan) {
 	resultChan <- result
 }
 
-var handleFilter handleFunc = func(node *flowNode, resultChan FlowResultChan) {
+var handleFilter handleFunc = func(node *flowNode, resultChan flowResultChan) {
 	output := node.next.channel
 	defer close(output)
 	filterFunc := node.operator.(FilterFunc)
@@ -79,7 +79,7 @@ var handleFilter handleFunc = func(node *flowNode, resultChan FlowResultChan) {
 	}
 }
 
-var handleSort handleFunc = func(node *flowNode, resultChan FlowResultChan) {
+var handleSort handleFunc = func(node *flowNode, resultChan flowResultChan) {
 	output := node.next.channel
 	defer close(output)
 	for value, ok := <-node.channel; ok; value, ok = <-node.channel {
@@ -90,7 +90,7 @@ var handleSort handleFunc = func(node *flowNode, resultChan FlowResultChan) {
 	}
 }
 
-var handleDistinct handleFunc = func(node *flowNode, resultChan FlowResultChan) {
+var handleDistinct handleFunc = func(node *flowNode, resultChan flowResultChan) {
 	output := node.next.channel
 	defer close(output)
 	dict := make(map[interface{}]bool)
@@ -102,7 +102,7 @@ var handleDistinct handleFunc = func(node *flowNode, resultChan FlowResultChan) 
 	}
 }
 
-var handleLimit handleFunc = func(node *flowNode, resultChan FlowResultChan) {
+var handleLimit handleFunc = func(node *flowNode, resultChan flowResultChan) {
 	output := node.next.channel
 	defer close(output)
 	limit := node.limitOrSkip
@@ -117,7 +117,7 @@ var handleLimit handleFunc = func(node *flowNode, resultChan FlowResultChan) {
 	}
 }
 
-var handleSkip handleFunc = func(node *flowNode, resultChan FlowResultChan) {
+var handleSkip handleFunc = func(node *flowNode, resultChan flowResultChan) {
 	output := node.next.channel
 	defer close(output)
 	skip := node.limitOrSkip
@@ -132,7 +132,7 @@ var handleSkip handleFunc = func(node *flowNode, resultChan FlowResultChan) {
 	}
 }
 
-var handleAllMatch handleFunc = func(node *flowNode, resultChan FlowResultChan) {
+var handleAllMatch handleFunc = func(node *flowNode, resultChan flowResultChan) {
 	defer close(resultChan)
 	matchFunc := node.operator.(MatchFunc)
 	flag := true
@@ -150,7 +150,7 @@ var handleAllMatch handleFunc = func(node *flowNode, resultChan FlowResultChan) 
 	}
 }
 
-var handleAnyMatch handleFunc = func(node *flowNode, resultChan FlowResultChan) {
+var handleAnyMatch handleFunc = func(node *flowNode, resultChan flowResultChan) {
 	defer close(resultChan)
 	matchFunc := node.operator.(MatchFunc)
 	flag := false
@@ -168,7 +168,7 @@ var handleAnyMatch handleFunc = func(node *flowNode, resultChan FlowResultChan) 
 	}
 }
 
-var handleNoneMatch handleFunc = func(node *flowNode, resultChan FlowResultChan) {
+var handleNoneMatch handleFunc = func(node *flowNode, resultChan flowResultChan) {
 	defer close(resultChan)
 	matchFunc := node.operator.(MatchFunc)
 	flag := true
@@ -186,7 +186,7 @@ var handleNoneMatch handleFunc = func(node *flowNode, resultChan FlowResultChan)
 	}
 }
 
-var handleEmpty handleFunc = func(node *flowNode, resultChan FlowResultChan) {
+var handleEmpty handleFunc = func(node *flowNode, resultChan flowResultChan) {
 	defer close(resultChan)
 	if _, ok := <-node.channel; !ok {
 		resultChan <- true
@@ -197,7 +197,7 @@ var handleEmpty handleFunc = func(node *flowNode, resultChan FlowResultChan) {
 	}
 }
 
-var handleCollect handleFunc = func(node *flowNode, resultChan FlowResultChan) {
+var handleCollect handleFunc = func(node *flowNode, resultChan flowResultChan) {
 	defer close(resultChan)
 	flowResult := make([]interface{}, 0)
 	for value, ok := <-node.channel; ok; value, ok = <-node.channel {
@@ -206,7 +206,7 @@ var handleCollect handleFunc = func(node *flowNode, resultChan FlowResultChan) {
 	resultChan <- flowResult
 }
 
-var handleCount handleFunc = func(node *flowNode, resultChan FlowResultChan) {
+var handleCount handleFunc = func(node *flowNode, resultChan flowResultChan) {
 	defer close(resultChan)
 	var count int
 	for _, ok := <-node.channel; ok; _, ok = <-node.channel {
@@ -215,7 +215,7 @@ var handleCount handleFunc = func(node *flowNode, resultChan FlowResultChan) {
 	resultChan <- count
 }
 
-var handleMax handleFunc = func(node *flowNode, resultChan FlowResultChan) {
+var handleMax handleFunc = func(node *flowNode, resultChan flowResultChan) {
 	defer close(resultChan)
 	var max interface{}
 	if value, ok := <-node.channel; ok {
@@ -230,7 +230,7 @@ var handleMax handleFunc = func(node *flowNode, resultChan FlowResultChan) {
 	resultChan <- max
 }
 
-var handleMin handleFunc = func(node *flowNode, resultChan FlowResultChan) {
+var handleMin handleFunc = func(node *flowNode, resultChan flowResultChan) {
 	defer close(resultChan)
 	var max interface{}
 	if value, ok := <-node.channel; ok {
